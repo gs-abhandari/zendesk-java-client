@@ -314,7 +314,7 @@ public class RealSmokeTest {
             assertThat(instance.getTicket(ticket.getId()), notNullValue());
             firstId = Math.min(ticket.getId(), firstId);
         }
-        while (ticket.getId() < firstId + 5L); // seed enough data for the paging tests
+        while (ticket.getId() < firstId + Long.valueOf(System.getProperty("count"))); // seed enough data for the paging tests
     }
 
     @Test
