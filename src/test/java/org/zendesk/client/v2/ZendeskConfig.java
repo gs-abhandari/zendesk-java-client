@@ -40,6 +40,7 @@ public final class ZendeskConfig {
             }
 
             if (result.isEmpty()) {
+                System.out.println("Result is empty");
                 return null;
             }
         } else {
@@ -47,6 +48,7 @@ public final class ZendeskConfig {
                 result.load(is);
                 is.close();
             } catch (IOException e) {
+                System.out.println("unable to Load");
                 return null;
             }
         }
