@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<suite name="Avengers Zendesk Suite" preserve-order="true">
+
+    <test verbose="3" name="360 Customer360Milestones Tests" preserve-order="true">
+        <groups>
+            <run>
+                <exclude name="Bug"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="org.zendesk.client.v2.RealSmokeTest">
+                <methods>
+                    <include name="createSolveTickets"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+
+</suite>

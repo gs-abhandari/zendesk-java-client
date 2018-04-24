@@ -1,23 +1,10 @@
 package org.zendesk.client.v2;
 
+import org.apache.http.HttpStatus;
 import org.junit.After;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.zendesk.client.v2.model.Audit;
-import org.zendesk.client.v2.model.Collaborator;
-import org.zendesk.client.v2.model.Comment;
-import org.zendesk.client.v2.model.Field;
-import org.zendesk.client.v2.model.Group;
-import org.zendesk.client.v2.model.Identity;
-import org.zendesk.client.v2.model.JobStatus;
-import org.zendesk.client.v2.model.Organization;
-import org.zendesk.client.v2.model.Request;
-import org.zendesk.client.v2.model.Status;
-import org.zendesk.client.v2.model.SuspendedTicket;
-import org.zendesk.client.v2.model.Ticket;
-import org.zendesk.client.v2.model.TicketForm;
-import org.zendesk.client.v2.model.User;
+import org.zendesk.client.v2.model.*;
 import org.zendesk.client.v2.model.events.Event;
 import org.zendesk.client.v2.model.hc.Article;
 import org.zendesk.client.v2.model.hc.Category;
@@ -25,6 +12,8 @@ import org.zendesk.client.v2.model.hc.Section;
 import org.zendesk.client.v2.model.hc.Translation;
 import org.zendesk.client.v2.model.targets.Target;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,6 +23,7 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.UUID;
 
+import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -55,12 +45,18 @@ public class RealSmokeTest {
     private static Properties config;
 
     private Zendesk instance;
+    private String xyz;
 
     @BeforeClass
     public static void loadConfig() {
         config = ZendeskConfig.load();
         assumeThat("We have a configuration", config, notNullValue());
         assertThat("Configuration has an url", config.getProperty("url"), notNullValue());
+    }
+
+    @Test
+    public void test(){
+        System.out.println("Abhilash");
     }
 
     public void assumeHaveToken() {
@@ -98,26 +94,27 @@ public class RealSmokeTest {
 
     @Test
     public void createClientWithTokenOrPassword() throws Exception {
+        System.out.println("Running Before class");
         assumeHaveTokenOrPassword();
         final Zendesk.Builder builder = new Zendesk.Builder(config.getProperty("url"))
                 .setUsername(config.getProperty("username"));
-        if (config.getProperty("token") != null) {
+        /*if (config.getProperty("token") != null) {
             builder.setToken(config.getProperty("token"));
-        } else if (config.getProperty("password") != null) {
+        } else*/ if (config.getProperty("password") != null) {
             builder.setPassword(config.getProperty("password"));
         }
         instance = builder.build();
     }
 
-    @Test
+    @Test //Fine
     public void getTicket() throws Exception {
         createClientWithTokenOrPassword();
-        Ticket ticket = instance.getTicket(1);
+        Ticket ticket = instance.getTicket(55);
+        System.out.println(ticket.getUrl());
         assertThat(ticket, notNullValue());
     }
 
     @Test
-    @Ignore("Needs specfic ticket form instance")
     public void getTicketForm() throws Exception {
         createClientWithTokenOrPassword();
         TicketForm ticketForm = instance.getTicketForm(27562);
@@ -136,7 +133,6 @@ public class RealSmokeTest {
     }
     
     @Test
-    @Ignore("Needs specfic ticket form instance")
     public void getTicketFieldsOnForm() throws Exception {
         createClientWithTokenOrPassword();
         TicketForm ticketForm = instance.getTicketForm(27562);
@@ -163,7 +159,6 @@ public class RealSmokeTest {
     }
     
     @Test
-    @Ignore("Needs test data setup correctly")
     public void getTicketsPagesRequests() throws Exception {
         createClientWithTokenOrPassword();
         int count = 0;
@@ -177,7 +172,6 @@ public class RealSmokeTest {
     }
 
     @Test
-    @Ignore("Needs test data setup correctly")
     public void getRecentTickets() throws Exception {
         createClientWithTokenOrPassword();
         int count = 0;
@@ -228,6 +222,7 @@ public class RealSmokeTest {
         createClientWithTokenOrPassword();
         int count = 0;
         for (Field f : instance.getTicketFields()) {
+            System.out.println(f.getUrl());
             assertThat(f, notNullValue());
             assertThat(f.getId(), notNullValue());
             assertThat(f.getType(), notNullValue());
@@ -256,7 +251,6 @@ public class RealSmokeTest {
     }
 
     @Test
-    @Ignore("Don't spam zendesk")
     public void createDeleteTicket() throws Exception {
         createClientWithTokenOrPassword();
         assumeThat("Must have a requester email", config.getProperty("requester.email"), notNullValue());
@@ -276,18 +270,18 @@ public class RealSmokeTest {
             assertThat("Collaborators", ticketCollaborators.size(), is(2));
             assertThat("First Collaborator", ticketCollaborators.get(0).getEmail(), anyOf(is("alice@example.org"), is("bob@example.org")));
         } finally {
-            instance.deleteTicket(ticket.getId());
+          //  instance.deleteTicket(ticket.getId());
         }
         assertThat(ticket.getSubject(), is(t.getSubject()));
         assertThat(ticket.getRequester(), nullValue());
         assertThat(ticket.getRequesterId(), notNullValue());
         assertThat(ticket.getDescription(), is(t.getComment().getBody()));
         assertThat("Collaborators", ticket.getCollaboratorIds().size(), is(2));
-        assertThat(instance.getTicket(ticket.getId()), nullValue());
+//        assertThat(instance.getTicket(ticket.getId()), nullValue());
     }
 
-    @Test
-    @Ignore("Don't spam zendesk")
+    // Used for creating multiple zendesk tickets
+    @Test()
     public void createSolveTickets() throws Exception {
         createClientWithTokenOrPassword();
         assumeThat("Must have a requester email", config.getProperty("requester.email"), notNullValue());
@@ -296,7 +290,7 @@ public class RealSmokeTest {
         do {
             Ticket t = new Ticket(
                     new Ticket.Requester(config.getProperty("requester.name"), config.getProperty("requester.email")),
-                    "This is a test " + UUID.randomUUID().toString(), new Comment("Please ignore this ticket"));
+                    "This is a test " + UUID.randomUUID().toString(), new Comment("please ignore this ticket"));
             ticket = instance.createTicket(t);
             System.out.println(ticket.getId() + " -> " + ticket.getUrl());
             assertThat(ticket.getId(), notNullValue());
@@ -304,7 +298,9 @@ public class RealSmokeTest {
                 assertThat(t2, notNullValue());
                 assertThat(t2.getId(), is(ticket.getId()));
                 t2.setAssigneeId(instance.getCurrentUser().getId());
-                t2.setStatus(Status.CLOSED);
+                t2.setStatus(Status.OPEN);
+                t2.setPriority(Priority.HIGH);
+                t2.setType(Type.TASK);
                 instance.updateTicket(t2);
             assertThat(ticket.getSubject(), is(t.getSubject()));
             assertThat(ticket.getRequester(), nullValue());
@@ -312,13 +308,14 @@ public class RealSmokeTest {
             assertThat(ticket.getDescription(), is(t.getComment().getBody()));
             assertThat(instance.getTicket(ticket.getId()), notNullValue());
             firstId = Math.min(ticket.getId(), firstId);
-        } while (ticket.getId() < firstId + 200L); // seed enough data for the paging tests
+        } while (ticket.getId() < firstId + Long.valueOf(System.getProperty("count"))); // seed enough data for the paging tests
     }
 
     @Test
     public void lookupUserByEmail() throws Exception {
         createClientWithTokenOrPassword();
         String requesterEmail = config.getProperty("requester.email");
+        System.out.println(requesterEmail);
         assumeThat("Must have a requester email", requesterEmail, notNullValue());
         for (User user : instance.lookupUserByEmail(requesterEmail)) {
             assertThat(user.getEmail(), is(requesterEmail));
@@ -371,6 +368,7 @@ public class RealSmokeTest {
         createClientWithTokenOrPassword();
         int count = 0;
         for (User u : instance.getUsers()) {
+            System.out.println(u.getName());
             assertThat(u.getName(), notNullValue());
             if (++count > 10) {
                 break;
@@ -406,19 +404,36 @@ public class RealSmokeTest {
     public void getOrganizations() throws Exception {
         createClientWithTokenOrPassword();
         int count = 0;
+        String filename = "./Organization.csv";
+        File f=new File(filename);
+        System.out.println("cannonical path is " +f.getCanonicalPath());
+        FileWriter fw = new FileWriter(filename);
+        fw.append("OrganizationName");
+        fw.append(',');
+        fw.append("OrganizationId");
+        fw.append('\n');
         for (Organization t : instance.getOrganizations()) {
+            System.out.println(t.getName());
+            System.out.println(t.getId());
+            fw.append(t.getName());
+            fw.append(',');
+            fw.append(String.valueOf(t.getId()));
+            fw.append('\n');
             assertThat(t.getName(), notNullValue());
-            if (++count > 10) {
+            if (++count > 2000) {
                 break;
             }
         }
+        fw.flush();
+        fw.close();
     }
 
     @Test
     public void getOrganizationsIncrementally() throws Exception {
         createClientWithTokenOrPassword();
         int count = 0;
-        for (Organization t : instance.getOrganizationsIncrementally(new Date(0L))) {
+        for (Organization t : instance.getOrganizationsIncrementally(new Date(1L))) {
+            System.out.println(t.getName());
             assertThat(t.getName(), notNullValue());
             if (++count > 10) {
                 break;
@@ -439,53 +454,62 @@ public class RealSmokeTest {
 
         Organization org = new Organization();
         org.setExternalId("testorg");
-        org.setName("Test Organization");
+        org.setName("Test Organization1");
         Organization result = instance.createOrganization(org);
         assertNotNull(result);
         assertNotNull(result.getId());
-        assertEquals("Test Organization", result.getName());
+        assertEquals("Test Organization1", result.getName());
         assertEquals("testorg", result.getExternalId());
-        instance.deleteOrganization(result);
+        System.out.println("Sucessfully created Organization");
+    //    instance.deleteOrganization(result);
     }
 
-    @Test(timeout = 10000)
+    // creates multiple organizations
+    @Test()
     public void createOrganizations() throws Exception {
         createClientWithTokenOrPassword();
 
         // Clean up to avoid conflicts
         for (Organization t : instance.getOrganizations()) {
-            if ("testorg1".equals(t.getExternalId()) || "testorg2".equals(t.getExternalId())) {
+            if (t.getExternalId()!=null && "testorg".contains(t.getExternalId())) {
                 instance.deleteOrganization(t);
             }
         }
 
-        Organization org1 = new Organization();
-        org1.setExternalId("testorg1");
-        org1.setName("Test Organization 1");
 
-        Organization org2 = new Organization();
-        org2.setExternalId("testorg2");
-        org2.setName("Test Organization 2");
+        for (int i=1;i<=500;i++) {
+            Organization org1 = new Organization();
+            org1.setExternalId("testorg" + i);
+            org1.setName("Test Organization " + i);
+            org1.setDomainNames(Arrays.asList("Test."+i+""));
+            System.out.println("Creating organization: " +"Test Organization " + i);
 
-        JobStatus<Organization> result = instance.createOrganizations(org1, org2);
-        assertNotNull(result);
-        assertNotNull(result.getId());
-        assertNotNull(result.getStatus());
-
-        while (result.getStatus() != JobStatus.JobStatusEnum.completed) {
-            result = instance.getJobStatus(result);
+            JobStatus<Organization> result = instance.createOrganizations(org1);
             assertNotNull(result);
             assertNotNull(result.getId());
             assertNotNull(result.getStatus());
-        }
 
-        List<Organization> resultOrgs = result.getResults();
 
-        assertEquals(2, resultOrgs.size());
-        for (Organization org : resultOrgs) {
+            System.out.println(given().header("Authorization","Basic YnVkYXR0dUBnYWluc2lnaHQuY29tOjEyMzQ1NjdqYnI=").header("Content-Type","application/json").body("{\"user\":{\"name\":\"Abhilash done\",\"email\":\"abhilash@done.com\",\"verified\":true}}").log().ifValidationFails()
+                    .when().post("https://gainsight29.zendesk.com/api/v2/users.json").
+                            then().log().body().statusCode(HttpStatus.SC_CREATED).extract().response().getBody().jsonPath().get("result"));
+
+            while (result.getStatus() != JobStatus.JobStatusEnum.completed) {
+                result = instance.getJobStatus(result);
+                assertNotNull(result);
+                assertNotNull(result.getId());
+                assertNotNull(result.getStatus());
+            }
+
+            List<Organization> resultOrgs = result.getResults();
+
+            assertEquals(1, resultOrgs.size());
+/*        for (Organization org : resultOrgs) {
             assertNotNull(org.getId());
             instance.deleteOrganization(org);
+        }*/
         }
+        System.out.println("Organizations created successfully");
     }
 
     @Test(timeout = 10000)
@@ -544,6 +568,7 @@ public class RealSmokeTest {
         createClientWithTokenOrPassword();
         int count = 0;
         for (Group t : instance.getGroups()) {
+            System.out.println(t.getName());
             assertThat(t.getName(), notNullValue());
             if (++count > 10) {
                 break;
@@ -556,6 +581,7 @@ public class RealSmokeTest {
         createClientWithTokenOrPassword();
         int count = 0;
         for (Article t : instance.getArticles()) {
+            System.out.println(t.getLabelNames());
             assertThat(t.getTitle(), notNullValue());
             if (++count > 40) {  // Check enough to pull 2 result pages
                 break;
@@ -646,5 +672,12 @@ public class RealSmokeTest {
                 throw zre;
             }
         }
+    }
+
+    @Test
+    public void testCreateUsers() throws Exception {
+
+
+
     }
 }
