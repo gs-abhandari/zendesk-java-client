@@ -1,9 +1,13 @@
 package org.zendesk.client.v2;
 
 import org.apache.http.HttpStatus;
-import org.junit.After;
+/*import org.junit.After;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.Test;*/
+
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 import org.zendesk.client.v2.model.*;
 import org.zendesk.client.v2.model.events.Event;
 import org.zendesk.client.v2.model.hc.Article;
@@ -55,7 +59,7 @@ public class RealSmokeTest {
     }
 
     @Test
-    public void test(){
+    public void test() {
         System.out.println("Abhilash");
     }
 
@@ -75,7 +79,7 @@ public class RealSmokeTest {
                 true));
     }
 
-    @After
+    @AfterClass
     public void closeClient() {
         if (instance != null) {
             instance.close();
@@ -100,7 +104,8 @@ public class RealSmokeTest {
                 .setUsername(config.getProperty("username"));
         /*if (config.getProperty("token") != null) {
             builder.setToken(config.getProperty("token"));
-        } else*/ if (config.getProperty("password") != null) {
+        } else*/
+        if (config.getProperty("password") != null) {
             builder.setPassword(config.getProperty("password"));
         }
         instance = builder.build();
@@ -121,23 +126,23 @@ public class RealSmokeTest {
         assertThat(ticketForm, notNullValue());
         assertTrue(ticketForm.isEndUserVisible());
     }
- 
+
     @Test
     public void getTicketForms() throws Exception {
         createClientWithTokenOrPassword();
         Iterable<TicketForm> ticketForms = instance.getTicketForms();
         assertTrue(ticketForms.iterator().hasNext());
-        for(TicketForm ticketForm : ticketForms){
-        	assertThat(ticketForm, notNullValue());
+        for (TicketForm ticketForm : ticketForms) {
+            assertThat(ticketForm, notNullValue());
         }
     }
-    
+
     @Test
     public void getTicketFieldsOnForm() throws Exception {
         createClientWithTokenOrPassword();
         TicketForm ticketForm = instance.getTicketForm(27562);
-        for(Integer id :ticketForm.getTicketFieldIds()){
-            Field f = instance.getTicketField(id);  
+        for (Integer id : ticketForm.getTicketFieldIds()) {
+            Field f = instance.getTicketField(id);
             assertNotNull(f);
         }
         assertThat(ticketForm, notNullValue());
@@ -157,7 +162,7 @@ public class RealSmokeTest {
             }
         }
     }
-    
+
     @Test
     public void getTicketsPagesRequests() throws Exception {
         createClientWithTokenOrPassword();
@@ -270,7 +275,7 @@ public class RealSmokeTest {
             assertThat("Collaborators", ticketCollaborators.size(), is(2));
             assertThat("First Collaborator", ticketCollaborators.get(0).getEmail(), anyOf(is("alice@example.org"), is("bob@example.org")));
         } finally {
-          //  instance.deleteTicket(ticket.getId());
+            //  instance.deleteTicket(ticket.getId());
         }
         assertThat(ticket.getSubject(), is(t.getSubject()));
         assertThat(ticket.getRequester(), nullValue());
@@ -294,21 +299,22 @@ public class RealSmokeTest {
             ticket = instance.createTicket(t);
             System.out.println(ticket.getId() + " -> " + ticket.getUrl());
             assertThat(ticket.getId(), notNullValue());
-                Ticket t2 = instance.getTicket(ticket.getId());
-                assertThat(t2, notNullValue());
-                assertThat(t2.getId(), is(ticket.getId()));
-                t2.setAssigneeId(instance.getCurrentUser().getId());
-                t2.setStatus(Status.OPEN);
-                t2.setPriority(Priority.HIGH);
-                t2.setType(Type.TASK);
-                instance.updateTicket(t2);
+            Ticket t2 = instance.getTicket(ticket.getId());
+            assertThat(t2, notNullValue());
+            assertThat(t2.getId(), is(ticket.getId()));
+            t2.setAssigneeId(instance.getCurrentUser().getId());
+            t2.setStatus(Status.OPEN);
+            t2.setPriority(Priority.HIGH);
+            t2.setType(Type.TASK);
+            instance.updateTicket(t2);
             assertThat(ticket.getSubject(), is(t.getSubject()));
             assertThat(ticket.getRequester(), nullValue());
             assertThat(ticket.getRequesterId(), notNullValue());
             assertThat(ticket.getDescription(), is(t.getComment().getBody()));
             assertThat(instance.getTicket(ticket.getId()), notNullValue());
             firstId = Math.min(ticket.getId(), firstId);
-        } while (ticket.getId() < firstId + Long.valueOf(System.getProperty("count"))); // seed enough data for the paging tests
+        }
+        while (ticket.getId() < firstId + Long.valueOf(System.getProperty("count"))); // seed enough data for the paging tests
     }
 
     @Test
@@ -327,7 +333,7 @@ public class RealSmokeTest {
         createClientWithTokenOrPassword();
         String requesterEmail = config.getProperty("requester.email");
         assumeThat("Must have a requester email", requesterEmail, notNullValue());
-        for (User user : instance.getSearchResults(User.class, "requester:"+requesterEmail)) {
+        for (User user : instance.getSearchResults(User.class, "requester:" + requesterEmail)) {
             assertThat(user.getEmail(), is(requesterEmail));
         }
     }
@@ -405,8 +411,8 @@ public class RealSmokeTest {
         createClientWithTokenOrPassword();
         int count = 0;
         String filename = "./Organization.csv";
-        File f=new File(filename);
-        System.out.println("cannonical path is " +f.getCanonicalPath());
+        File f = new File(filename);
+        System.out.println("cannonical path is " + f.getCanonicalPath());
         FileWriter fw = new FileWriter(filename);
         fw.append("OrganizationName");
         fw.append(',');
@@ -461,7 +467,7 @@ public class RealSmokeTest {
         assertEquals("Test Organization1", result.getName());
         assertEquals("testorg", result.getExternalId());
         System.out.println("Sucessfully created Organization");
-    //    instance.deleteOrganization(result);
+        //    instance.deleteOrganization(result);
     }
 
     // creates multiple organizations
@@ -471,18 +477,18 @@ public class RealSmokeTest {
 
         // Clean up to avoid conflicts
         for (Organization t : instance.getOrganizations()) {
-            if (t.getExternalId()!=null && "testorg".contains(t.getExternalId())) {
+            if (t.getExternalId() != null && "testorg".contains(t.getExternalId())) {
                 instance.deleteOrganization(t);
             }
         }
 
 
-        for (int i=1;i<=500;i++) {
+        for (int i = 1; i <= 500; i++) {
             Organization org1 = new Organization();
             org1.setExternalId("testorg" + i);
             org1.setName("Test Organization " + i);
-            org1.setDomainNames(Arrays.asList("Test."+i+""));
-            System.out.println("Creating organization: " +"Test Organization " + i);
+            org1.setDomainNames(Arrays.asList("Test." + i + ""));
+            System.out.println("Creating organization: " + "Test Organization " + i);
 
             JobStatus<Organization> result = instance.createOrganizations(org1);
             assertNotNull(result);
@@ -490,7 +496,7 @@ public class RealSmokeTest {
             assertNotNull(result.getStatus());
 
 
-            System.out.println(given().header("Authorization","Basic YnVkYXR0dUBnYWluc2lnaHQuY29tOjEyMzQ1NjdqYnI=").header("Content-Type","application/json").body("{\"user\":{\"name\":\"Abhilash done\",\"email\":\"abhilash@done.com\",\"verified\":true}}").log().ifValidationFails()
+            System.out.println(given().header("Authorization", "Basic YnVkYXR0dUBnYWluc2lnaHQuY29tOjEyMzQ1NjdqYnI=").header("Content-Type", "application/json").body("{\"user\":{\"name\":\"Abhilash done\",\"email\":\"abhilash@done.com\",\"verified\":true}}").log().ifValidationFails()
                     .when().post("https://gainsight29.zendesk.com/api/v2/users.json").
                             then().log().body().statusCode(HttpStatus.SC_CREATED).extract().response().getBody().jsonPath().get("result"));
 
@@ -512,7 +518,7 @@ public class RealSmokeTest {
         System.out.println("Organizations created successfully");
     }
 
-    @Test(timeout = 10000)
+    @Test(timeOut = 10000)
     public void bulkCreateMultipleJobs() throws Exception {
         createClientWithTokenOrPassword();
 
@@ -641,7 +647,7 @@ public class RealSmokeTest {
             if (++categoryCount > 10) {
                 break;
             }
-            for (Translation t: instance.getCategoryTranslations(cat.getId())) {
+            for (Translation t : instance.getCategoryTranslations(cat.getId())) {
                 assertNotNull(t.getId());
                 assertNotNull(t.getTitle());
                 assertNotNull(t.getBody());
@@ -655,7 +661,7 @@ public class RealSmokeTest {
     @Test
     public void getArticlesIncrementally() throws Exception {
         createClientWithTokenOrPassword();
-        final long ONE_WEEK = 7*24*60*60*1000;
+        final long ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
         int count = 0;
         try {
             for (Article t : instance.getArticlesIncrementally(new Date(new Date().getTime() - ONE_WEEK))) {
@@ -676,7 +682,6 @@ public class RealSmokeTest {
 
     @Test
     public void testCreateUsers() throws Exception {
-
 
 
     }
