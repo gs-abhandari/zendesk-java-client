@@ -26,8 +26,8 @@ public final class ZendeskConfig {
      */
     public static Properties load() {
         Properties result = new Properties();
-        System.out.println("zendesk properies file length: " + new File("zendesk.properties").length());
-        System.out.println(System.getProperty("user.dir"));
+        System.out.println("zendesk properies file length: " + new File(System.getProperty("user.dir") + "/ws/src/test/resources/zendesk.properties").length());
+        System.out.println(System.getProperty("user.dir") + "");
         InputStream is = ZendeskConfig.class.getResourceAsStream("/zendesk.properties");
         if (is == null) {
             Map<String, String> systemVars = System.getenv();
