@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<suite name="Avengers Zendesk Suite" preserve-order="true">
+
+    <test verbose="3" name="Create Zendesk Tickets" preserve-order="true">
+        <classes>
+            <class name="org.zendesk.client.v2.RealSmokeTest">
+                <methods>
+                    <include name="createSolveTickets"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+
+</suite>
