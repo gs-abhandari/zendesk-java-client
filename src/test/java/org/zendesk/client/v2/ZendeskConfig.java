@@ -1,5 +1,6 @@
 package org.zendesk.client.v2;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -20,18 +21,19 @@ public final class ZendeskConfig {
     /**
      * Reads variables from a properties file, or if none found, reads from environment variables
      * Environment variables should have a prefix, "ZENDESK_JAVA_CLIENT_TEST_" to be properly used
-     * 
+     *
      * @return A Properties object
      */
     public static Properties load() {
         Properties result = new Properties();
+        System.out.println("zendesk properies file length: " + new File("/zendesk.properties").length());
         InputStream is = ZendeskConfig.class.getResourceAsStream("/zendesk.properties");
         if (is == null) {
             Map<String, String> systemVars = System.getenv();
-            for(String key : systemVars.keySet()) {
-                if(key.startsWith(ZENDESK_VARIABLE_PREFIX)) {
+            for (String key : systemVars.keySet()) {
+                if (key.startsWith(ZENDESK_VARIABLE_PREFIX)) {
                     // Remove the prefix and normalize the key name
-                    String newKey = key.substring(ZENDESK_VARIABLE_PREFIX.length()).toLowerCase().replaceAll("_",".");
+                    String newKey = key.substring(ZENDESK_VARIABLE_PREFIX.length()).toLowerCase().replaceAll("_", ".");
                     result.put(newKey, systemVars.get(key));
                 }
             }
