@@ -2,12 +2,15 @@ package org.zendesk.client.v2.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * @author jyrij
  */
-public class Metric {
+public class Metric implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @JsonProperty("id")
     protected Long id;
@@ -33,18 +36,25 @@ public class Metric {
     protected Date assignedAt;
     @JsonProperty("solved_at")
     protected Date solvedAt;
+    @JsonProperty("latest_comment_added_at")
     protected Date lastCommentAddedAt;
-    @JsonProperty("first_resolution_time_in_minutes")
+    @JsonProperty("reply_time_in_minutes")
     protected ZendeskComboMinutes replyTimeMinutes;
+    @JsonProperty("first_resolution_time_in_minutes")
+    protected ZendeskComboMinutes firstResolutionTimeMinutes;
     @JsonProperty("full_resolution_time_in_minutes")
     protected ZendeskComboMinutes fullResolutionTimeMinutes;
     @JsonProperty("agent_wait_time_in_minutes")
     protected ZendeskComboMinutes agentWaitTimeMinutes;
     @JsonProperty("requester_wait_time_in_minutes")
     protected ZendeskComboMinutes requesterWaitTimeMinutes;
+    @JsonProperty("on_hold_time_in_minutes")
+    protected ZendeskComboMinutes onHoldTimeMinutes;
     @JsonProperty("created_at")
     protected Date createdAt;
-
+    @JsonProperty("updated_at")
+    protected Date updatedAt;
+    
     public Long getId() {
         return id;
     }
@@ -77,6 +87,14 @@ public class Metric {
         this.createdAt = createdAt;
     }
 
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+    
     public Long getGroupStations() {
         return groupStations;
     }
@@ -160,7 +178,15 @@ public class Metric {
     public ZendeskComboMinutes getReplyTimeMinutes() {
         return replyTimeMinutes;
     }
+    
+    public ZendeskComboMinutes getFirstResolutionTimeMinutes() {
+        return firstResolutionTimeMinutes;
+    }
 
+    public void setFirstResolutionTimeMinutes(ZendeskComboMinutes firstResolutionTimeMinutes) {
+        this.firstResolutionTimeMinutes = firstResolutionTimeMinutes;
+    }
+    
     public void setReplyTimeMinutes(ZendeskComboMinutes replyTimeMinutes) {
         this.replyTimeMinutes = replyTimeMinutes;
     }
@@ -188,6 +214,14 @@ public class Metric {
     public void setRequesterWaitTimeMinutes(ZendeskComboMinutes requesterWaitTimeMinutes) {
         this.requesterWaitTimeMinutes = requesterWaitTimeMinutes;
     }
+    
+    public ZendeskComboMinutes getOnHoldTimeMinutes() {
+        return onHoldTimeMinutes;
+    }
+
+    public void setOnHoldTimeMinutes(ZendeskComboMinutes onHoldTimeMinutes) {
+        this.onHoldTimeMinutes = onHoldTimeMinutes;
+    }
 
     @Override
     public String toString() {
@@ -213,7 +247,7 @@ public class Metric {
                 '}';
     }
 
-    protected class ZendeskComboMinutes {
+    public class ZendeskComboMinutes {
 
         @JsonProperty("calendar")
         protected Long calendarMinutes;

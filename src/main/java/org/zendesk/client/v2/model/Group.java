@@ -2,13 +2,17 @@ package org.zendesk.client.v2.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * @author stephenc
  * @since 22/04/2013 16:27
  */
-public class Group implements SearchResultEntity {
+public class Group implements SearchResultEntity, Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private Long id;
     private String url;
     private String name;
@@ -60,7 +64,7 @@ public class Group implements SearchResultEntity {
         this.createdAt = createdAt;
     }
 
-    @JsonProperty("deleted_at")
+    @JsonProperty("updated_at")
     public Date getUpdatedAt() {
         return updatedAt;
     }

@@ -2,13 +2,17 @@ package org.zendesk.client.v2.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * @author stephenc
  * @since 09/04/2013 15:08
  */
-public class Request {
+public class Request implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     protected Long id;
     protected String url;
     protected String subject;
@@ -18,6 +22,7 @@ public class Request {
     protected Long requesterId;
     protected Long organizationId;
     protected Via via;
+    protected Long viaFollowupSourceId;
     protected Date createdAt;
     protected Date updatedAt;
     protected Comment comment;
@@ -108,6 +113,15 @@ public class Request {
 
     public void setVia(Via via) {
         this.via = via;
+    }
+
+    @JsonProperty("via_followup_source_id")
+    public Long getViaFollowupSourceId() {
+        return viaFollowupSourceId;
+    }
+
+    public void setViaFollowupSourceId(Long viaFollowupSourceId) {
+        this.viaFollowupSourceId = viaFollowupSourceId;
     }
 
     public Comment getComment() {

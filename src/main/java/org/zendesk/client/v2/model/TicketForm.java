@@ -1,5 +1,6 @@
 package org.zendesk.client.v2.model;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -7,7 +8,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TicketForm implements SearchResultEntity {
+public class TicketForm implements SearchResultEntity, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
 	private Long id;
 	private String name;
@@ -24,7 +27,7 @@ public class TicketForm implements SearchResultEntity {
 	@JsonProperty("default")
 	private boolean defaultForm;
 	@JsonProperty("ticket_field_ids")
-	private List<Integer> ticketFieldIds;
+	private List<Long> ticketFieldIds;
 	@JsonProperty("created_at")
     private Date createdAt;
 	@JsonProperty("updated_at")
@@ -78,10 +81,10 @@ public class TicketForm implements SearchResultEntity {
 	public void setDefaultForm(boolean defaultForm) {
 		this.defaultForm = defaultForm;
 	}
-	public List<Integer> getTicketFieldIds() {
+	public List<Long> getTicketFieldIds() {
 		return ticketFieldIds;
 	}
-	public void setTicketFieldIds(List<Integer> ticketFieldIds) {
+	public void setTicketFieldIds(List<Long> ticketFieldIds) {
 		this.ticketFieldIds = ticketFieldIds;
 	}
 	public Date getCreatedAt() {

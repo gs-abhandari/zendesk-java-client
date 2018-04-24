@@ -2,6 +2,7 @@ package org.zendesk.client.v2.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -12,7 +13,10 @@ import java.util.Map;
  * @author stephenc
  * @since 05/04/2013 15:32
  */
-public class User extends Collaborator implements SearchResultEntity {
+public class User extends Collaborator implements SearchResultEntity, Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private Long id;
     private String url;
     private String externalId;
@@ -23,9 +27,11 @@ public class User extends Collaborator implements SearchResultEntity {
     private Boolean verified;
     private Boolean shared;
     private Long localeId;
+    private String locale;
     private String timeZone;
     private Date lastLoginAt;
     private String phone;
+    private Boolean restrictedAgent;
     private String signature;
     private String details;
     private String notes;
@@ -59,7 +65,7 @@ public class User extends Collaborator implements SearchResultEntity {
     public User(Boolean verified, String name, Identity... identities) {
         super(name);
         this.verified = verified;
-        this.identities = new ArrayList<Identity>(Arrays.asList(identities));
+        this.identities = new ArrayList<>(Arrays.asList(identities));
     }
 
     public User(String name, String email) {
@@ -73,7 +79,7 @@ public class User extends Collaborator implements SearchResultEntity {
 
     public User(String name, Identity... identities) {
         super(name);
-        this.identities = new ArrayList<Identity>(Arrays.asList(identities));
+        this.identities = new ArrayList<>(Arrays.asList(identities));
     }
 
     public List<Identity> getIdentities() {
@@ -159,6 +165,15 @@ public class User extends Collaborator implements SearchResultEntity {
 
     public void setLocaleId(Long localeId) {
         this.localeId = localeId;
+    }
+
+    @JsonProperty("locale")
+    public String getLocale() {
+      return locale;
+    }
+
+    public void setLocale(String locale) {
+      this.locale = locale;
     }
 
     public Boolean getModerator() {
@@ -312,4 +327,12 @@ public class User extends Collaborator implements SearchResultEntity {
         this.remotePhotoUrl = remotePhotoUrl;
     }
 
+    @JsonProperty("restricted_agent")
+    public Boolean getRestrictedAgent() {
+        return restrictedAgent;
+    }
+
+    public void setRestrictedAgent(Boolean restrictedAgent) {
+        this.restrictedAgent = restrictedAgent;
+    }
 }

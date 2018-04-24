@@ -141,7 +141,7 @@ public class RealSmokeTest {
     public void getTicketFieldsOnForm() throws Exception {
         createClientWithTokenOrPassword();
         TicketForm ticketForm = instance.getTicketForm(27562);
-        for (Integer id : ticketForm.getTicketFieldIds()) {
+        for (Long id : ticketForm.getTicketFieldIds()) {
             Field f = instance.getTicketField(id);
             assertNotNull(f);
         }
@@ -498,7 +498,7 @@ public class RealSmokeTest {
 
             System.out.println(given().header("Authorization", "Basic YnVkYXR0dUBnYWluc2lnaHQuY29tOjEyMzQ1NjdqYnI=").header("Content-Type", "application/json").body("{\"user\":{\"name\":\"Abhilash done\",\"email\":\"abhilash@done.com\",\"verified\":true}}").log().ifValidationFails()
                     .when().post("https://gainsight29.zendesk.com/api/v2/users.json").
-                            then().log().body().statusCode(HttpStatus.SC_CREATED).extract().response().getBody().jsonPath().get("result"));
+                            then().log().body().statusCode(HttpStatus.SC_CREATED).extract().response().getBody().jsonPath().get("result").toString());
 
             while (result.getStatus() != JobStatus.JobStatusEnum.completed) {
                 result = instance.getJobStatus(result);

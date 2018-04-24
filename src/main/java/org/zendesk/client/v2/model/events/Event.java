@@ -1,5 +1,8 @@
 package org.zendesk.client.v2.model.events;
 
+import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -7,7 +10,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  * @author stephenc
  * @since 05/04/2013 11:53
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type",
+    visible = true, defaultImpl = UnknownEvent.class)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = CommentEvent.class, name = "Comment"),
         @JsonSubTypes.Type(value = VoiceCommentEvent.class, name = "VoiceComment"),
@@ -26,10 +30,14 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = TicketSharingEvent.class, name = "TicketSharingEvent"),
         @JsonSubTypes.Type(value = AttachmentRedactionEvent.class, name = "AttachmentRedactionEvent" ),
         @JsonSubTypes.Type(value = CommentRedactionEvent.class, name = "CommentRedactionEvent" ),
-        @JsonSubTypes.Type(value = OrganizationActivityEvent.class, name = "OrganizationActivity" )
+        @JsonSubTypes.Type(value = OrganizationActivityEvent.class, name = "OrganizationActivity"),
+        @JsonSubTypes.Type(value = AgentMacroReferenceEvent.class, name = "AgentMacroReference")
 })
+@JsonIgnoreProperties(ignoreUnknown = true)
+public abstract class Event implements Serializable {
 
-public abstract class Event {
+    private static final long serialVersionUID = 1L;
+
     private Long id;
 
     public Long getId() {
